@@ -3,6 +3,7 @@ workflows:
     name: Android Capacitor Build
     instance_type: mac_mini_m1
     environment:
+      java: 17
       node: latest
     scripts:
       - name: Install dependencies

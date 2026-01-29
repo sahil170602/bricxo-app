@@ -1,5 +1,8 @@
 {
   "appId": "com.bricxo.supply",
-  "appName": "Bricxo",
-  "webDir": "dist"
+  "appName": "Bricxo", 
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
 }
