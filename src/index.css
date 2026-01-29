@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* FORCE DARK MODE CLASS STRATEGY
+  This overrides the default 'system' preference and tells Tailwind 
+  to apply dark styles only when the '.dark' class is present on the HTML tag.
+*/
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Smooth background transition when toggling */
+body {
+  @apply transition-colors duration-300 ease-in-out;
+}
