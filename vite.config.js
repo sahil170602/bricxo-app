@@ -7,4 +7,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  // 👇 THIS IS THE FIX. It forces relative paths for CSS/Images.
+  base: './', 
 })
