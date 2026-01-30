@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* 👇 THIS LINE FIXES THE THEME TOGGLE IN V4 */
+/* It forces Tailwind to use the ".dark" class instead of system settings */
+@variant dark (&:where(.dark, .dark *));
+
 html, body {
   height: 100%;
   width: 100%;
@@ -8,6 +12,7 @@ html, body {
   touch-action: pan-y;
   -webkit-user-select: none; /* Optional: Stops text selection like an app */
   user-select: none;
+  background-color: #0f172a; /* Keeps the background dark to match app */
 }
 
 #root {
