@@ -1,7 +1,7 @@
 ext {
     minSdkVersion = 22
-    compileSdkVersion = 34
-    targetSdkVersion = 34
+    compileSdkVersion = 35
+    targetSdkVersion = 35
     
     // Lock these libraries to stable versions to prevent build errors
     androidxActivityVersion = '1.8.2'
