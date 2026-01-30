@@ -3,7 +3,7 @@ import {
   LayoutDashboard, ShoppingBag, ListOrdered, CheckCircle, 
   LogOut, Plus, Trash2, Edit2, X, Search, Package, 
   Truck, Clock, Bell, Menu, Upload, Image as ImageIcon,
-  Layers, Star, CheckSquare
+  Layers, Star, CheckSquare, Lock
 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
@@ -15,23 +15,69 @@ export default function AdminDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // --- FETCH DATA FROM SUPABASE ---
-  const fetchData = async () => {
-    const { data: prodData } = await supabase.from('products').select('*').order('id');
-    const { data: catData } = await supabase.from('categories').select('*').order('id');
-    const { data: ordData } = await supabase.from('orders').select('*').order('timestamp', { ascending: false });
+  // --- AUTH STATES ---
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const ADMIN_PIN = "1234"; // 🔒 CHANGE THIS PIN TO SECURE YOUR ADMIN
 
-    if (prodData) setProducts(prodData);
-    if (catData) setCategories(catData);
-    if (ordData) setOrders(ordData);
-    setLoading(false);
+  // --- CHECK AUTH ON LOAD ---
+  useEffect(() => {
+    const authStatus = sessionStorage.getItem('admin_auth');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+      fetchData(); // Load data immediately if already logged in
+    } else {
+      setLoading(false); // Stop loading to show lock screen
+    }
+  }, []);
+
+  // --- HANDLE LOGIN ---
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (pin === ADMIN_PIN) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin_auth', 'true');
+      fetchData(); // Fetch data upon successful login
+    } else {
+      setError('Invalid PIN');
+      setPin('');
+    }
   };
 
+  // --- HANDLE LOGOUT ---
+  const handleLogout = () => {
+    if(window.confirm("Are you sure you want to sign out?")) {
+      sessionStorage.removeItem('admin_auth');
+      setIsAuthenticated(false);
+      setPin('');
+      setError('');
+    }
+  };
+
+  // --- FETCH DATA FROM SUPABASE ---
+  const fetchData = async () => {
+    try {
+      const { data: prodData } = await supabase.from('products').select('*').order('id');
+      const { data: catData } = await supabase.from('categories').select('*').order('id');
+      const { data: ordData } = await supabase.from('orders').select('*').order('timestamp', { ascending: false });
+
+      if (prodData) setProducts(prodData);
+      if (catData) setCategories(catData);
+      if (ordData) setOrders(ordData);
+    } catch (err) {
+      console.error("Error fetching data", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Auto-refresh data every 5 seconds only if authenticated
   useEffect(() => {
-    fetchData();
+    if(!isAuthenticated) return;
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isAuthenticated]);
 
   // --- ACTIONS ---
 
@@ -69,7 +115,7 @@ export default function AdminDashboard() {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="p-10 text-center text-gray-500">Connecting to Supabase...</div>;
+    if (loading && isAuthenticated) return <div className="p-10 text-center text-gray-500">Connecting to Supabase...</div>;
 
     switch (activeTab) {
       case 'dashboard': return <DashboardHome orders={orders} products={products} />;
@@ -80,51 +126,102 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- LOCK SCREEN UI ---
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
+          <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock size={32} />
+          </div>
+          <h1 className="text-2xl font-black text-slate-800 mb-2">Admin Locked</h1>
+          <p className="text-gray-500 mb-6 text-sm">Enter security PIN to access dashboard</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input 
+              type="password" 
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              className="w-full text-center text-2xl tracking-[0.5em] font-bold p-4 border-2 border-gray-200 rounded-xl outline-none focus:border-orange-500 transition-colors"
+              placeholder="••••"
+              maxLength={4}
+              autoFocus
+            />
+            {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
+            <button type="submit" className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-colors">
+              Unlock
+            </button>
+            <button type="button" onClick={() => window.location.href='/'} className="block w-full text-gray-400 text-xs font-bold hover:text-gray-600">
+              Back to App
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // --- MAIN DASHBOARD UI ---
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans text-slate-800 relative overflow-x-hidden">
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 w-full bg-slate-900 text-white p-4 flex justify-between items-center z-30 shadow-md">
+    <div className="h-screen bg-gray-50 flex font-sans text-slate-800 relative overflow-hidden">
+      
+      {/* Mobile Header - Visible only on small screens */}
+      <div className="md:hidden fixed top-0 w-full bg-slate-900 text-white p-4 flex justify-between items-center z-40 shadow-md h-16">
         <h1 className="text-xl font-black text-orange-500 tracking-tighter">BRICXO</h1>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
+      {/* Backdrop for Mobile Menu */}
+      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
 
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 right-0 md:left-0 bg-slate-900 text-white w-64 transform transition-transform duration-300 z-30 shadow-2xl md:shadow-none ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'} flex flex-col h-full`}>
-        <div className="p-6 mt-16 md:mt-0">
-          <h1 className="text-2xl font-black text-orange-500 tracking-tighter hidden md:block">BRICXO<span className="text-white">.</span></h1>
-          <p className="text-xs text-slate-500 uppercase tracking-widest mt-1 hidden md:block">Admin Console</p>
-          <div className="md:hidden flex items-center justify-between mb-6">
-             <span className="text-lg font-bold">Menu</span>
-             <button onClick={() => setIsMobileMenuOpen(false)}><X size={20} className="text-slate-400"/></button>
+      {/* Sidebar - FIXED UI */}
+      <aside className={`fixed inset-y-0 right-0 md:left-0 bg-slate-900 text-white w-64 transform transition-transform duration-300 z-50 shadow-2xl md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'} flex flex-col h-full`}>
+        
+        {/* Sidebar Header */}
+        <div className="p-6">
+          {/* Desktop Logo */}
+          <div className="hidden md:block">
+            <h1 className="text-2xl font-black text-orange-500 tracking-tighter">BRICXO<span className="text-white">.</span></h1>
+            <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Admin Console</p>
+          </div>
+
+          {/* Mobile Menu Header - Aligned Top */}
+          <div className="md:hidden flex items-center justify-between">
+             <span className="text-xl font-bold tracking-tight text-white">Menu</span>
+             <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
+               <X size={20} />
+             </button>
           </div>
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
+        {/* Navigation Items */}
+        <nav className="flex-1 px-4 space-y-3 overflow-y-auto mt-2">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Overview" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }} />
           <NavItem icon={<ShoppingBag size={20}/>} label="Products" active={activeTab === 'products'} onClick={() => { setActiveTab('products'); setIsMobileMenuOpen(false); }} />
           <NavItem icon={<ListOrdered size={20}/>} label="Live Orders" active={activeTab === 'orders'} onClick={() => { setActiveTab('orders'); setIsMobileMenuOpen(false); }} />
           <NavItem icon={<CheckCircle size={20}/>} label="Completed" active={activeTab === 'history'} onClick={() => { setActiveTab('history'); setIsMobileMenuOpen(false); }} />
         </nav>
 
+        {/* Footer / Sign Out */}
         <div className="p-4 border-t border-slate-800">
-          <button className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors w-full p-2">
-            <LogOut size={20} /> <span className="text-sm font-bold">Logout</span>
+          <button onClick={handleLogout} className="flex items-center gap-3 text-slate-400 hover:text-red-400 transition-colors w-full p-3 hover:bg-slate-800 rounded-xl font-bold">
+            <LogOut size={20} /> <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto mt-14 md:mt-0 w-full md:ml-64">
+      {/* Main Content Area */}
+      <main className="md:ml-64 flex-1 h-full overflow-y-auto p-4 md:p-8 pt-20 md:pt-8 bg-gray-50">
         <header className="flex justify-between items-center mb-6 md:mb-10">
           <div><h2 className="text-2xl md:text-3xl font-bold capitalize">{activeTab}</h2></div>
           <div className="flex gap-4">
             <div className="w-8 h-8 md:w-10 md:h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-orange-500/30">A</div>
           </div>
         </header>
-        {renderContent()}
+        <div className="pb-20">
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
@@ -132,7 +229,7 @@ export default function AdminDashboard() {
 
 // --- SUB-PAGES ---
 
-const DashboardHome = ({ orders, products }) => {
+const DashboardHome = ({ orders = [], products = [] }) => {
   const pending = orders.filter(o => o.status === 'Pending').length;
   const active = orders.filter(o => o.status === 'Out for Delivery' || o.status === 'Accepted').length;
   const done = orders.filter(o => o.status === 'Delivered').length;
@@ -153,7 +250,7 @@ const ProductManager = ({ products, categories, onSave, onDelete, onAddCategory,
   const [editingItem, setEditingItem] = useState(null);
   const [newCatName, setNewCatName] = useState('');
   const [newCatIcon, setNewCatIcon] = useState(null);
-  const [searchTerm, setSearchTerm] = useState(''); // Added Search State
+  const [searchTerm, setSearchTerm] = useState('');
 
   const openModal = (item = null) => {
     setEditingItem(item || { name: '', price: '', category: categories[0]?.name || '', image: '', featured: false });
@@ -273,12 +370,12 @@ const ProductManager = ({ products, categories, onSave, onDelete, onAddCategory,
               </div>
               <div><label className="block text-xs font-bold uppercase text-gray-500 mb-1">Item Name</label><input value={editingItem.name} onChange={e => setEditingItem({...editingItem, name: e.target.value})} className="w-full p-3 border rounded-lg outline-none focus:border-orange-500" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-xs font-bold uppercase text-gray-500 mb-1">Price (Visible to Admin)</label><input value={editingItem.price} onChange={e => setEditingItem({...editingItem, price: e.target.value})} className="w-full p-3 border rounded-lg outline-none focus:border-orange-500" type="number" /></div>
-                 <div><label className="block text-xs font-bold uppercase text-gray-500 mb-1">Category</label><select value={editingItem.category} onChange={e => setEditingItem({...editingItem, category: e.target.value})} className="w-full p-3 border rounded-lg outline-none focus:border-orange-500 bg-white"><option value="" disabled>Select Category</option>{categories.map(cat => (<option key={cat.id} value={cat.name}>{cat.name}</option>))}</select></div>
+                <div><label className="block text-xs font-bold uppercase text-gray-500 mb-1">Price</label><input value={editingItem.price} onChange={e => setEditingItem({...editingItem, price: e.target.value})} className="w-full p-3 border rounded-lg outline-none focus:border-orange-500" type="number" /></div>
+                 <div><label className="block text-xs font-bold uppercase text-gray-500 mb-1">Category</label><select value={editingItem.category} onChange={e => setEditingItem({...editingItem, category: e.target.value})} className="w-full p-3 border rounded-lg outline-none focus:border-orange-500 bg-white"><option value="" disabled>Select</option>{categories.map(cat => (<option key={cat.id} value={cat.name}>{cat.name}</option>))}</select></div>
               </div>
               <div className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer bg-gray-50" onClick={() => setEditingItem({...editingItem, featured: !editingItem.featured})}>
                 <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${editingItem.featured ? 'bg-orange-500 border-orange-500' : 'border-gray-300 bg-white'}`}>{editingItem.featured && <CheckCircle size={14} className="text-white" />}</div>
-                <span className="text-sm font-bold text-gray-700">Show on Homepage (Featured)</span>
+                <span className="text-sm font-bold text-gray-700">Show on Homepage</span>
               </div>
               <button onClick={() => { onSave(editingItem); setModalOpen(false); }} className="w-full bg-orange-600 text-white py-3 rounded-lg font-bold mt-2 hover:bg-orange-700">Save Item</button>
             </div>

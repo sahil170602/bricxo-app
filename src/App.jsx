@@ -18,13 +18,20 @@ const OWNER_PHONE_NUMBER = "917972506748";
 // --- Components ---
 
 const Navbar = ({ darkMode, toggleTheme, onOpenCalc }) => (
-  // FIXED: Always bg-slate-900 (Dark Header) regardless of theme
-  <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 py-4 pt-3 bg-slate-900 z-50 border-b border-slate-800 shadow-lg h-[72px]">
-    <div>
+  // FIXED: Added style to handle Status Bar padding internally
+  <div 
+    className="absolute top-0 left-0 right-0 flex justify-between items-start px-6 pb-3 bg-slate-900 z-50 border-b border-slate-800 shadow-lg"
+    style={{ 
+      paddingTop: 'max(12px, env(safe-area-inset-top))', // Pushes text down safely
+      height: 'auto',
+      minHeight: 'calc(72px + env(safe-area-inset-top))' // Grows to fit status bar
+    }}
+  >
+    <div className="mt-1">
       <h1 className="text-xl font-black tracking-tighter text-orange-500">BRICXO</h1>
       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Construction Supply</p>
     </div>
-    <div className="flex gap-2">
+    <div className="flex gap-2 mt-1">
       <button onClick={onOpenCalc} className="p-2 rounded-xl bg-slate-800 text-blue-400 hover:bg-slate-700 transition-colors border border-slate-700">
         <CalculatorIcon size={18} />
       </button>
@@ -38,35 +45,20 @@ const Navbar = ({ darkMode, toggleTheme, onOpenCalc }) => (
 const ProductCard = ({ product, qty, onUpdateQty }) => {
   const [imgError, setImgError] = useState(false);
   return (
-    // FIXED: Card has border to stand out against white background
     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-gray-900 p-3 rounded-[24px] shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden group flex flex-col justify-between transition-colors duration-300">
-      
-      {/* IMAGE SECTION */}
       <div className="h-32 flex items-center justify-center mb-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl transition-colors duration-300">
         {!imgError && product.image ? (
-          <img 
-            src={product.image} 
-            className="w-full h-full object-contain drop-shadow-xl" 
-            onError={() => setImgError(true)} 
-            alt={product.name}
-          />
+          <img src={product.image} className="w-full h-full object-contain drop-shadow-xl" onError={() => setImgError(true)} alt={product.name} />
         ) : (
-          <div className="flex flex-col items-center justify-center text-gray-300 dark:text-gray-600">
-            <Package size={32} />
-            <span className="text-[10px] font-bold mt-1 uppercase">No Image</span>
-          </div>
+          <div className="flex flex-col items-center justify-center text-gray-300 dark:text-gray-600"><Package size={32} /><span className="text-[10px] font-bold mt-1 uppercase">No Image</span></div>
         )}
       </div>
-      
-      {/* DETAILS SECTION */}
       <div>
         <h3 className="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight mb-1 line-clamp-2 min-h-[2.5em]">{product.name}</h3>
         <div className="flex justify-between items-end mt-2">
           <div><p className="text-orange-600 font-bold text-xs uppercase tracking-wide">Get Quote</p></div>
           {qty === 0 ? (
-            <motion.button whileTap={{ scale: 0.9 }} onClick={() => onUpdateQty(product, 1)} className="bg-slate-900 dark:bg-white text-white dark:text-gray-900 w-9 h-9 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform">
-              <Plus size={18} />
-            </motion.button>
+            <motion.button whileTap={{ scale: 0.9 }} onClick={() => onUpdateQty(product, 1)} className="bg-slate-900 dark:bg-white text-white dark:text-gray-900 w-9 h-9 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"><Plus size={18} /></motion.button>
           ) : (
             <div className="flex items-center bg-slate-900 dark:bg-white rounded-full p-1 h-9 shadow-lg">
               <button onClick={() => onUpdateQty(product, -1)} className="w-7 h-full flex items-center justify-center text-white dark:text-gray-900"><Minus size={14} /></button>
@@ -93,11 +85,7 @@ const LoginScreen = ({ onLogin }) => {
     if(!phone || phone.length < 10) return alert("Enter valid phone");
     setLoading(true);
     const { data, error } = await supabase.from('users').select('*').eq('phone', phone).single();
-    if(data) {
-      onLogin(data);
-    } else {
-      setStep(2); 
-    }
+    if(data) { onLogin(data); } else { setStep(2); }
     setLoading(false);
   };
 
@@ -111,44 +99,23 @@ const LoginScreen = ({ onLogin }) => {
   };
 
   return (
-    // FIXED: Login screen stays dark premium style
     <div className="fixed inset-0 w-full h-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center z-[60]">
-      <div className="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl border border-slate-700 shadow-orange-500/10">
-        <Construction size={48} className="text-orange-500" />
-      </div>
-      
+      <div className="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl border border-slate-700 shadow-orange-500/10"><Construction size={48} className="text-orange-500" /></div>
       <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Welcome to BRICXO</h1>
       <p className="text-slate-400 mb-10 text-sm font-medium">Your construction materials partner.</p>
-      
       <div className="w-full max-w-sm space-y-4 bg-slate-800/50 p-6 rounded-3xl border border-slate-700 backdrop-blur-sm">
         {step === 1 && (
           <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}}>
             <label className="text-xs font-bold text-slate-400 uppercase mb-2 block text-left ml-1">Mobile Number</label>
-            <input 
-              type="tel" 
-              value={phone} 
-              onChange={e => setPhone(e.target.value)} 
-              placeholder="9876543210" 
-              className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none focus:border-orange-500 text-lg font-bold text-center placeholder-slate-600 transition-colors" 
-            />
-            <button onClick={checkUser} disabled={loading} className="w-full bg-orange-600 text-white py-4 rounded-xl font-bold mt-4 shadow-lg hover:bg-orange-500 active:scale-95 transition-all">
-              {loading ? "Checking..." : "Continue"}
-            </button>
+            <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="9876543210" className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none focus:border-orange-500 text-lg font-bold text-center placeholder-slate-600 transition-colors" />
+            <button onClick={checkUser} disabled={loading} className="w-full bg-orange-600 text-white py-4 rounded-xl font-bold mt-4 shadow-lg hover:bg-orange-500 active:scale-95 transition-all">{loading ? "Checking..." : "Continue"}</button>
           </motion.div>
         )}
         {step === 2 && (
           <motion.div initial={{opacity:0, x:20}} animate={{opacity:1, x:0}} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-slate-400 uppercase mb-1 block text-left ml-1">Full Name</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none placeholder-slate-600 focus:border-orange-500" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 uppercase mb-1 block text-left ml-1">Delivery Address</label>
-              <textarea value={address} onChange={e => setAddress(e.target.value)} placeholder="House No, Street, City..." className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none placeholder-slate-600 focus:border-orange-500 resize-none" rows="3"></textarea>
-            </div>
-            <button onClick={registerUser} disabled={loading} className="w-full bg-orange-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-orange-500 active:scale-95 transition-all">
-              {loading ? "Creating..." : "Start Ordering"}
-            </button>
+            <div><label className="text-xs font-bold text-slate-400 uppercase mb-1 block text-left ml-1">Full Name</label><input value={name} onChange={e => setName(e.target.value)} placeholder="John Doe" className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none placeholder-slate-600 focus:border-orange-500" /></div>
+            <div><label className="text-xs font-bold text-slate-400 uppercase mb-1 block text-left ml-1">Delivery Address</label><textarea value={address} onChange={e => setAddress(e.target.value)} placeholder="House No, Street, City..." className="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none placeholder-slate-600 focus:border-orange-500 resize-none" rows="3"></textarea></div>
+            <button onClick={registerUser} disabled={loading} className="w-full bg-orange-600 text-white py-4 rounded-xl font-bold shadow-lg hover:bg-orange-500 active:scale-95 transition-all">{loading ? "Creating..." : "Start Ordering"}</button>
           </motion.div>
         )}
       </div>
@@ -158,34 +125,22 @@ const LoginScreen = ({ onLogin }) => {
 
 const HomePage = ({ products, qtyHelper, updateQty }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  
   const featuredProducts = products.filter(p => p.featured);
-  const filteredProducts = featuredProducts.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = featuredProducts.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="h-full overflow-y-auto pt-[80px] pb-32 no-scrollbar">
+    // FIXED: Padding top calculation ensures content starts below the safe-area header
+    <div className="h-full overflow-y-auto pb-32 no-scrollbar" style={{ paddingTop: 'calc(90px + env(safe-area-inset-top))' }}>
       <div className="px-6 mt-2 mb-4">
         <div className="relative">
           <Search className="absolute left-4 top-3.5 text-gray-400" size={20} />
-          <input 
-            type="text" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search featured items..." 
-            // FIXED: Search bar has border in light mode
-            className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-orange-500/20 shadow-sm transition-all text-gray-900 dark:text-white" 
-          />
+          <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search featured items..." className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-orange-500/20 shadow-sm transition-all text-gray-900 dark:text-white" />
         </div>
       </div>
-      
       <div className="px-6">
         <h2 className="text-xl font-black mb-4 flex items-center gap-2 text-slate-800 dark:text-white">Featured Products <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 text-[10px] px-2 py-1 rounded-full">HOT</span></h2>
         <div className="grid grid-cols-2 gap-4">
-          {filteredProducts.length > 0 ? filteredProducts.map(p => (
-            <ProductCard key={p.id} product={p} qty={qtyHelper(p.id)} onUpdateQty={updateQty} />
-          )) : <div className="col-span-2 text-center text-gray-400 py-10 italic">No featured products found.</div>}
+          {filteredProducts.length > 0 ? filteredProducts.map(p => (<ProductCard key={p.id} product={p} qty={qtyHelper(p.id)} onUpdateQty={updateQty} />)) : <div className="col-span-2 text-center text-gray-400 py-10 italic">No featured products found.</div>}
         </div>
       </div>
     </div>
@@ -195,56 +150,31 @@ const HomePage = ({ products, qtyHelper, updateQty }) => {
 const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  
   const sortedProducts = [...products].sort((a, b) => b.id - a.id);
-  const filteredProducts = sortedProducts.filter(p => {
-    const matchesCategory = filter === 'All' || p.category === filter;
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredProducts = sortedProducts.filter(p => { const matchesCategory = filter === 'All' || p.category === filter; const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()); return matchesCategory && matchesSearch; });
 
   return (
     <div className="h-full w-full relative">
-      {/* FIXED HEADER: Always Dark Slate 900 */}
-      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-4 shadow-lg h-[110px] transition-colors duration-300">
-        <div className="flex justify-between items-center mb-3">
+      {/* FIXED HEADER: Padding Top handles Status Bar */}
+      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 px-4 shadow-lg transition-colors duration-300"
+           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))', height: 'auto', paddingBottom: '12px' }}>
+        <div className="flex justify-between items-center mb-3 mt-1">
            <h2 className="text-lg font-black px-2 text-white">All Products</h2>
            <div className="relative w-48">
               <Search className="absolute left-3 top-2 text-slate-400" size={14} />
-              <input 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..." 
-                className="w-full pl-9 pr-4 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 outline-none text-xs focus:border-orange-500 transition-colors" 
-              />
+              <input type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search..." className="w-full pl-9 pr-4 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 outline-none text-xs focus:border-orange-500 transition-colors" />
            </div>
         </div>
-        
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          <button 
-            onClick={() => setFilter('All')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${filter === 'All' ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
-          >
-            All Items
-          </button>
-          {categories.map(cat => (
-            <button 
-              key={cat.id} 
-              onClick={() => setFilter(cat.name)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${filter === cat.name ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
-            >
-              {cat.name}
-            </button>
-          ))}
+          <button onClick={() => setFilter('All')} className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${filter === 'All' ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>All Items</button>
+          {categories.map(cat => (<button key={cat.id} onClick={() => setFilter(cat.name)} className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${filter === cat.name ? 'bg-orange-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}>{cat.name}</button>))}
         </div>
       </div>
 
-      <div className="h-full overflow-y-auto pt-[120px] pb-32 px-6 no-scrollbar">
+      {/* FIXED BODY PADDING */}
+      <div className="h-full overflow-y-auto pb-32 px-6 no-scrollbar" style={{ paddingTop: 'calc(130px + env(safe-area-inset-top))' }}>
         <div className="grid grid-cols-2 gap-4">
-          {filteredProducts.length > 0 ? filteredProducts.map(p => (
-            <ProductCard key={p.id} product={p} qty={qtyHelper(p.id)} onUpdateQty={updateQty} />
-          )) : <div className="col-span-2 text-center text-gray-400 py-10 mt-10">No products found.</div>}
+          {filteredProducts.length > 0 ? filteredProducts.map(p => (<ProductCard key={p.id} product={p} qty={qtyHelper(p.id)} onUpdateQty={updateQty} />)) : <div className="col-span-2 text-center text-gray-400 py-10 mt-10">No products found.</div>}
         </div>
       </div>
     </div>
@@ -254,30 +184,24 @@ const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
 const AccountPage = ({ user, onLogout }) => {
   const [orders, setOrders] = useState([]);
   useEffect(() => {
-    const fetchHistory = async () => {
-      if(user?.phone) {
-        const { data } = await supabase.from('orders').select('*').eq('user_phone', user.phone).order('timestamp', { ascending: false });
-        if(data) setOrders(data);
-      }
-    };
+    const fetchHistory = async () => { if(user?.phone) { const { data } = await supabase.from('orders').select('*').eq('user_phone', user.phone).order('timestamp', { ascending: false }); if(data) setOrders(data); } };
     fetchHistory();
   }, [user]);
 
   return (
     <div className="h-full relative w-full">
-      {/* FIXED HEADER: Always Dark Slate 900 */}
-      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center transition-colors duration-300">
-        <h2 className="text-lg font-black text-white">My Account</h2>
+      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 px-6 shadow-lg flex items-center transition-colors duration-300"
+           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))', height: 'auto', paddingBottom: '12px' }}>
+        <h2 className="text-lg font-black text-white mt-1">My Account</h2>
       </div>
 
-      <div className="h-full overflow-y-auto pt-[70px] pb-32 px-6 no-scrollbar">
+      <div className="h-full overflow-y-auto pb-32 px-6 no-scrollbar" style={{ paddingTop: 'calc(80px + env(safe-area-inset-top))' }}>
         <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl mb-6 text-center border border-gray-100 dark:border-gray-800 shadow-sm mt-2 transition-colors duration-300">
           <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600 text-3xl font-bold shadow-inner">{user.name ? user.name[0] : <UserCircle size={40} />}</div>
           <h3 className="font-bold text-lg text-slate-800 dark:text-white">{user.name}</h3>
           <p className="text-xs text-gray-500">{user.phone}</p>
           <p className="text-xs text-gray-400 mt-1">{user.address}</p>
         </div>
-        
         <h4 className="text-xs font-bold uppercase text-gray-400 mb-4 ml-1">Order History</h4>
         <div className="space-y-3">
           {orders.length === 0 ? <p className="text-sm text-gray-400 italic text-center py-4">No past orders.</p> : orders.map(order => (
@@ -299,10 +223,7 @@ const AccountPage = ({ user, onLogout }) => {
 const TrackingPage = ({ user }) => {
   const [activeOrder, setActiveOrder] = useState(null);
   useEffect(() => {
-    const fetchActive = async () => {
-      const { data } = await supabase.from('orders').select('*').eq('user_phone', user.phone).neq('status', 'Delivered').order('timestamp', { ascending: false }).limit(1).single();
-      if(data) setActiveOrder(data);
-    };
+    const fetchActive = async () => { const { data } = await supabase.from('orders').select('*').eq('user_phone', user.phone).neq('status', 'Delivered').order('timestamp', { ascending: false }).limit(1).single(); if(data) setActiveOrder(data); };
     fetchActive();
     const interval = setInterval(fetchActive, 5000);
     return () => clearInterval(interval);
@@ -310,12 +231,12 @@ const TrackingPage = ({ user }) => {
 
   return (
     <div className="h-full relative bg-gray-50 dark:bg-gray-900 w-full overflow-hidden transition-colors duration-300">
-      {/* FIXED HEADER: Always Dark Slate 900 */}
-      <div className="absolute top-0 z-30 w-full bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center transition-colors duration-300">
-        <h2 className="text-lg font-black text-white">Track Order</h2>
+      <div className="absolute top-0 z-30 w-full bg-slate-900 border-b border-slate-800 px-6 shadow-lg flex items-center transition-colors duration-300"
+           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))', height: 'auto', paddingBottom: '12px' }}>
+        <h2 className="text-lg font-black text-white mt-1">Track Order</h2>
       </div>
 
-      <div className="absolute inset-0 bg-[#e5e7eb] dark:bg-[#1f2937] overflow-hidden pt-[60px] pb-[80px]">
+      <div className="absolute inset-0 bg-[#e5e7eb] dark:bg-[#1f2937] overflow-hidden pb-[80px]" style={{ paddingTop: 'calc(60px + env(safe-area-inset-top))' }}>
         {activeOrder ? (
           <>
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#6b7280 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
@@ -369,26 +290,18 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
   };
   return (
     <motion.div initial={{ opacity: 0, x: "100%" }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: "100%" }} className="fixed inset-0 z-50 bg-white dark:bg-gray-950 flex flex-col h-full">
-      {/* FIXED HEADER: Always Dark */}
-      <div className="p-6 pt-3 flex items-center gap-4 border-b border-slate-800 bg-slate-900 text-white transition-colors duration-300"><button onClick={onClose} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700 border border-slate-700"><ArrowLeft size={20} /></button><h2 className="text-xl font-black">Checkout</h2></div>
+      <div className="px-6 pb-3 flex items-center gap-4 border-b border-slate-800 bg-slate-900 text-white transition-colors duration-300"
+           style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
+        <button onClick={onClose} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700 border border-slate-700"><ArrowLeft size={20} /></button><h2 className="text-xl font-black">Checkout</h2>
+      </div>
       <div className="p-6 space-y-4 overflow-y-auto h-full pb-24">
-        
         <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 transition-colors duration-300">
-          <p className="font-bold text-gray-800 dark:text-gray-100">Deliver to:</p>
-          <p className="text-gray-700 dark:text-gray-300">{user.name}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{user.address}</p>
+          <p className="font-bold text-gray-800 dark:text-gray-100">Deliver to:</p><p className="text-gray-700 dark:text-gray-300">{user.name}</p><p className="text-sm text-gray-500 dark:text-gray-400">{user.address}</p>
         </div>
-        
         <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <p className="font-bold mb-2 text-gray-800 dark:text-gray-100">Items:</p>
-          {cart.map(i => (
-            <div key={i.id} className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
-              <span>{i.name}</span>
-              <span>x{i.qty}</span>
-            </div>
-          ))}
+          {cart.map(i => (<div key={i.id} className="flex justify-between text-sm text-gray-700 dark:text-gray-300"><span>{i.name}</span><span>x{i.qty}</span></div>))}
         </div>
-        
         <button onClick={handleWhatsAppOrder} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">Confirm Order <Send size={20} /></button>
       </div>
     </motion.div>
@@ -397,13 +310,7 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
 
 const UserApp = () => {
   const [user, setUser] = useState(null);
-  const [darkMode, setDarkMode] = useState(() => {
-    if (localStorage.getItem('theme')) {
-      return localStorage.getItem('theme') === 'dark';
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-
+  const [darkMode, setDarkMode] = useState(() => { if (localStorage.getItem('theme')) { return localStorage.getItem('theme') === 'dark'; } return window.matchMedia('(prefers-color-scheme: dark)').matches; });
   const [isCalcOpen, setIsCalcOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [view, setView] = useState('home');
@@ -412,43 +319,20 @@ const UserApp = () => {
 
   useEffect(() => {
     const sessionPhone = localStorage.getItem('bricxo_session_phone');
-    if(sessionPhone) {
-      supabase.from('users').select('*').eq('phone', sessionPhone).single().then(({data}) => { if(data) setUser(data); });
-    }
-    const fetchData = async () => {
-      const { data: prodData } = await supabase.from('products').select('*');
-      const { data: catData } = await supabase.from('categories').select('*');
-      if(prodData) setProducts(prodData);
-      if(catData) setCategories(catData);
-    };
+    if(sessionPhone) { supabase.from('users').select('*').eq('phone', sessionPhone).single().then(({data}) => { if(data) setUser(data); }); }
+    const fetchData = async () => { const { data: prodData } = await supabase.from('products').select('*'); const { data: catData } = await supabase.from('categories').select('*'); if(prodData) setProducts(prodData); if(catData) setCategories(catData); };
     fetchData();
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [darkMode]);
+  useEffect(() => { if (darkMode) { document.documentElement.classList.add('dark'); localStorage.setItem('theme', 'dark'); } else { document.documentElement.classList.remove('dark'); localStorage.setItem('theme', 'light'); } }, [darkMode]);
 
   const handleLogin = (userData) => { setUser(userData); localStorage.setItem('bricxo_session_phone', userData.phone); };
   const handleLogout = () => { setUser(null); localStorage.removeItem('bricxo_session_phone'); setCart([]); setView('home'); };
 
   const handleUpdateQty = (product, delta) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
-      if (existing) {
-        const newQty = existing.qty + delta;
-        if (newQty <= 0) return prev.filter(item => item.id !== product.id);
-        return prev.map(item => item.id === product.id ? { ...item, qty: newQty } : item);
-      } else if (delta > 0) return [...prev, { ...product, qty: 1 }];
-      return prev;
-    });
+    setCart(prev => { const existing = prev.find(item => item.id === product.id); if (existing) { const newQty = existing.qty + delta; if (newQty <= 0) return prev.filter(item => item.id !== product.id); return prev.map(item => item.id === product.id ? { ...item, qty: newQty } : item); } else if (delta > 0) return [...prev, { ...product, qty: 1 }]; return prev; });
   };
 
   const getItemQty = (id) => cart.find(i => i.id === id)?.qty || 0;
@@ -457,13 +341,8 @@ const UserApp = () => {
   if (!user) return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    // FIXED: Body is White (Light) or Slate-950 (Dark).
     <div className="fixed inset-0 w-full h-full bg-white dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden flex flex-col transition-colors duration-300">
-      
-      {view !== 'tracking' && view !== 'catalog' && view !== 'account' && (
-        <Navbar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} onOpenCalc={() => setIsCalcOpen(true)} />
-      )}
-
+      {view !== 'tracking' && view !== 'catalog' && view !== 'account' && (<Navbar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} onOpenCalc={() => setIsCalcOpen(true)} />)}
       <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar w-full h-full relative" style={{ WebkitOverflowScrolling: 'touch' }}>
         <AnimatePresence mode="wait">
            {view === 'home' && <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-full"><HomePage products={products} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
@@ -472,14 +351,9 @@ const UserApp = () => {
            {view === 'account' && <motion.div key="account" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full"><AccountPage user={user} onLogout={handleLogout} /></motion.div>}
         </AnimatePresence>
       </div>
-
       <AnimatePresence>{totalItems > 0 && view !== 'checkout' && <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setView('checkout')} className="fixed bottom-24 right-6 bg-green-600 text-white p-4 rounded-full shadow-2xl z-40 flex items-center justify-center hover:scale-105 transition-transform"><Send size={24} /><span className="absolute -top-1 -right-1 bg-white text-green-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-green-600">{totalItems}</span></motion.button>}</AnimatePresence>
-      
       <AnimatePresence>{view === 'checkout' && <CheckoutFlow cart={cart} user={user} onClose={() => setView('home')} onComplete={() => { setCart([]); setView('tracking'); }} />}</AnimatePresence>
-      
       <Calculator isOpen={isCalcOpen} onClose={() => setIsCalcOpen(false)} />
-
-      {/* FIXED BOTTOM NAV: Always Dark Slate 900 */}
       <div className="bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-safe-bottom z-50 shadow-2xl h-[80px] shrink-0 transition-colors duration-300">
         <button onClick={() => setView('home')} className={`flex flex-col items-center gap-1 ${view === 'home' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Home size={24} strokeWidth={view === 'home' ? 2.5 : 2} /></button>
         <button onClick={() => setView('catalog')} className={`flex flex-col items-center gap-1 ${view === 'catalog' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Package size={24} strokeWidth={view === 'catalog' ? 2.5 : 2} /></button>
