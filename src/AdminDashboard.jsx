@@ -3,7 +3,7 @@ import {
   LayoutDashboard, ShoppingBag, ListOrdered, CheckCircle, 
   LogOut, Plus, Trash2, Edit2, X, Search, Package, 
   Truck, Clock, Bell, Menu, Upload, Image as ImageIcon,
-  Layers, Star, CheckSquare, Lock
+  Layers, Star, CheckSquare, Lock, CreditCard
 } from 'lucide-react';
 import { supabase } from './supabaseClient';
 
@@ -19,33 +19,30 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const ADMIN_PIN = "1234"; // 🔒 CHANGE THIS PIN TO SECURE YOUR ADMIN
+  const ADMIN_PIN = "1234";
 
-  // --- CHECK AUTH ON LOAD ---
   useEffect(() => {
     const authStatus = sessionStorage.getItem('admin_auth');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
-      fetchData(); // Load data immediately if already logged in
+      fetchData();
     } else {
-      setLoading(false); // Stop loading to show lock screen
+      setLoading(false);
     }
   }, []);
 
-  // --- HANDLE LOGIN ---
   const handleLogin = (e) => {
     e.preventDefault();
     if (pin === ADMIN_PIN) {
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_auth', 'true');
-      fetchData(); // Fetch data upon successful login
+      fetchData();
     } else {
       setError('Invalid PIN');
       setPin('');
     }
   };
 
-  // --- HANDLE LOGOUT ---
   const handleLogout = () => {
     if(window.confirm("Are you sure you want to sign out?")) {
       sessionStorage.removeItem('admin_auth');
@@ -55,7 +52,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- FETCH DATA FROM SUPABASE ---
   const fetchData = async () => {
     try {
       const { data: prodData } = await supabase.from('products').select('*').order('id');
@@ -72,14 +68,11 @@ export default function AdminDashboard() {
     }
   };
 
-  // Auto-refresh data every 5 seconds only if authenticated
   useEffect(() => {
     if(!isAuthenticated) return;
     const interval = setInterval(fetchData, 5000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
-
-  // --- ACTIONS ---
 
   const handleUpdateStatus = async (id, status) => {
     setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
@@ -126,7 +119,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // --- LOCK SCREEN UI ---
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
@@ -160,11 +152,8 @@ export default function AdminDashboard() {
     );
   }
 
-  // --- MAIN DASHBOARD UI ---
   return (
     <div className="h-screen bg-gray-50 flex font-sans text-slate-800 relative overflow-hidden">
-      
-      {/* Mobile Header - Visible only on small screens */}
       <div className="md:hidden fixed top-0 w-full bg-slate-900 text-white p-4 flex justify-between items-center z-40 shadow-md h-16">
         <h1 className="text-xl font-black text-orange-500 tracking-tighter">BRICXO</h1>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -172,21 +161,14 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Backdrop for Mobile Menu */}
-      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
+      {isMobileMenuOpen && <div className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />}
 
-      {/* Sidebar - FIXED UI */}
       <aside className={`fixed inset-y-0 right-0 md:left-0 bg-slate-900 text-white w-64 transform transition-transform duration-300 z-50 shadow-2xl md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'} flex flex-col h-full`}>
-        
-        {/* Sidebar Header */}
         <div className="p-6">
-          {/* Desktop Logo */}
           <div className="hidden md:block">
             <h1 className="text-2xl font-black text-orange-500 tracking-tighter">BRICXO<span className="text-white">.</span></h1>
             <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Admin Console</p>
           </div>
-
-          {/* Mobile Menu Header - Aligned Top */}
           <div className="md:hidden flex items-center justify-between">
              <span className="text-xl font-bold tracking-tight text-white">Menu</span>
              <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors">
@@ -195,7 +177,6 @@ export default function AdminDashboard() {
           </div>
         </div>
         
-        {/* Navigation Items */}
         <nav className="flex-1 px-4 space-y-3 overflow-y-auto mt-2">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Overview" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }} />
           <NavItem icon={<ShoppingBag size={20}/>} label="Products" active={activeTab === 'products'} onClick={() => { setActiveTab('products'); setIsMobileMenuOpen(false); }} />
@@ -203,7 +184,6 @@ export default function AdminDashboard() {
           <NavItem icon={<CheckCircle size={20}/>} label="Completed" active={activeTab === 'history'} onClick={() => { setActiveTab('history'); setIsMobileMenuOpen(false); }} />
         </nav>
 
-        {/* Footer / Sign Out */}
         <div className="p-4 border-t border-slate-800">
           <button onClick={handleLogout} className="flex items-center gap-3 text-slate-400 hover:text-red-400 transition-colors w-full p-3 hover:bg-slate-800 rounded-xl font-bold">
             <LogOut size={20} /> <span>Sign Out</span>
@@ -211,7 +191,6 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="md:ml-64 flex-1 h-full overflow-y-auto p-4 md:p-8 pt-20 md:pt-8 bg-gray-50">
         <header className="flex justify-between items-center mb-6 md:mb-10">
           <div><h2 className="text-2xl md:text-3xl font-bold capitalize">{activeTab}</h2></div>
@@ -226,8 +205,6 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
-// --- SUB-PAGES ---
 
 const DashboardHome = ({ orders = [], products = [] }) => {
   const pending = orders.filter(o => o.status === 'Pending').length;
@@ -281,7 +258,6 @@ const ProductManager = ({ products, categories, onSave, onDelete, onAddCategory,
 
   return (
     <div className="space-y-8">
-      {/* Category Manager */}
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <h3 className="font-bold text-lg mb-4 flex items-center gap-2"><Layers size={20} className="text-orange-500"/> Manage Categories</h3>
         <div className="flex flex-wrap gap-4 items-end mb-4">
@@ -309,12 +285,10 @@ const ProductManager = ({ products, categories, onSave, onDelete, onAddCategory,
         </div>
       </div>
 
-      {/* Inventory */}
       <div>
         <div className="flex flex-col md:flex-row justify-between md:items-center mb-6 gap-4">
           <h3 className="font-bold text-lg">Inventory</h3>
           <div className="flex gap-4 w-full md:w-auto">
-            {/* Search Bar for Admin */}
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-3 text-gray-400" size={18} />
               <input 
@@ -394,10 +368,20 @@ const OrderManager = ({ orders, onUpdateStatus, type }) => {
       {filtered.slice().reverse().map(order => (
         <div key={order.id} className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="w-full">
-            <div className="flex items-center justify-between md:justify-start gap-3 mb-1"><span className="font-mono font-bold text-orange-600">{order.id}</span><span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'Pending' ? 'bg-blue-100 text-blue-600' : order.status === 'Delivered' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>{order.status}</span></div>
+            <div className="flex items-center justify-between md:justify-start gap-3 mb-1">
+              <span className="font-mono font-bold text-orange-600">{order.id}</span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${order.status === 'Pending' ? 'bg-blue-100 text-blue-600' : order.status === 'Delivered' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-600'}`}>{order.status}</span>
+            </div>
             <h4 className="font-bold text-lg">{order.customer_name}</h4>
             <p className="text-sm text-gray-500 mb-2 truncate max-w-[250px]">{order.address}</p>
-            <div className="text-sm text-gray-700 font-medium">{order.items.map(i => `${i.name} (${i.qty})`).join(', ')}</div>
+            <div className="text-sm text-gray-700 font-medium mb-2">{order.items.map(i => `${i.name} (${i.qty})`).join(', ')}</div>
+            
+            {/* Payment Mode Display */}
+            {order.payment_mode && (
+              <div className="inline-flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded text-xs font-bold text-gray-600">
+                <CreditCard size={12} /> {order.payment_mode}
+              </div>
+            )}
           </div>
           <div className="flex w-full md:w-auto gap-2">
             {order.status === 'Pending' && <button onClick={() => onUpdateStatus(order.id, 'Accepted')} className="flex-1 md:flex-none bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-blue-500 shadow-lg">Accept</button>}
