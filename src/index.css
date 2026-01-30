@@ -1,16 +1,25 @@
 @import "tailwindcss";
 
-/* FORCE DARK MODE CLASS STRATEGY
-  This overrides the default 'system' preference and tells Tailwind 
-  to apply dark styles only when the '.dark' class is present on the HTML tag.
-*/
-@variant dark (&:where(.dark, .dark *));
-
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* 🔒 Stops the whole page from scrolling */
+  overscroll-behavior: none; /* 🚫 Stops the "rubber band" effect on iOS */
+  touch-action: pan-y;
+  -webkit-user-select: none; /* Optional: Stops text selection like an app */
+  user-select: none;
 }
 
-/* Smooth background transition when toggling */
-body {
-  @apply transition-colors duration-300 ease-in-out;
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Hide Scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

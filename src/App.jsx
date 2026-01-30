@@ -431,27 +431,38 @@ const UserApp = () => {
   if (!user) return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    // FIXED: Main Container is h-screen and overflow-hidden. Only inner parts scroll.
-    <div className="h-screen w-full bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white transition-colors duration-300 font-sans relative overflow-hidden flex flex-col">
+    // 🔒 FIX: Use 'fixed inset-0' to lock the app to the viewport exactly.
+    <div className="fixed inset-0 w-full h-full bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden flex flex-col">
       
-      {/* Dynamic Header */}
+      {/* Header - Remains Absolute/Fixed at top */}
       {view !== 'tracking' && view !== 'catalog' && view !== 'account' && (
         <Navbar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} onOpenCalc={() => setIsCalcOpen(true)} />
       )}
 
-      {/* Views - Each component now handles its own scrolling internally */}
-      {view === 'home' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 overflow-hidden h-full"><HomePage products={products} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
-      {view === 'catalog' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 overflow-hidden h-full"><CatalogPage products={products} categories={categories} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
-      {view === 'tracking' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 overflow-hidden h-full"><TrackingPage user={user} /></motion.div>}
-      {view === 'account' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 overflow-hidden h-full"><AccountPage user={user} onLogout={handleLogout} /></motion.div>}
+      {/* SCROLLABLE CONTENT AREA 
+         - flex-1: Takes up all remaining space between header and footer
+         - overflow-y-auto: Allows ONLY this part to scroll
+      */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar w-full h-full relative" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <AnimatePresence mode="wait">
+           {view === 'home' && <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-full"><HomePage products={products} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
+           {view === 'catalog' && <motion.div key="catalog" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-full"><CatalogPage products={products} categories={categories} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
+           {view === 'tracking' && <motion.div key="tracking" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full"><TrackingPage user={user} /></motion.div>}
+           {view === 'account' && <motion.div key="account" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full"><AccountPage user={user} onLogout={handleLogout} /></motion.div>}
+        </AnimatePresence>
+      </div>
 
-      {/* Floating Elements */}
+      {/* Floating Checkout Button */}
       <AnimatePresence>{totalItems > 0 && view !== 'checkout' && <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setView('checkout')} className="fixed bottom-24 right-6 bg-green-600 text-white p-4 rounded-full shadow-2xl z-40 flex items-center justify-center hover:scale-105 transition-transform"><Send size={24} /><span className="absolute -top-1 -right-1 bg-white text-green-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-green-600">{totalItems}</span></motion.button>}</AnimatePresence>
+      
+      {/* Checkout Overlay */}
       <AnimatePresence>{view === 'checkout' && <CheckoutFlow cart={cart} user={user} onClose={() => setView('home')} onComplete={() => { setCart([]); setView('tracking'); }} />}</AnimatePresence>
+      
+      {/* Calculator Overlay */}
       <Calculator isOpen={isCalcOpen} onClose={() => setIsCalcOpen(false)} />
 
-      {/* Bottom Nav - FIXED POSITION */}
-      <div className="absolute bottom-0 w-full bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-8 z-30 shadow-2xl h-[80px]">
+      {/* Bottom Nav - Fixed at bottom of the Flex container */}
+      <div className="bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-safe-bottom z-50 shadow-2xl h-[80px] shrink-0">
         <button onClick={() => setView('home')} className={`flex flex-col items-center gap-1 ${view === 'home' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Home size={24} strokeWidth={view === 'home' ? 2.5 : 2} /></button>
         <button onClick={() => setView('catalog')} className={`flex flex-col items-center gap-1 ${view === 'catalog' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Package size={24} strokeWidth={view === 'catalog' ? 2.5 : 2} /></button>
         <button onClick={() => setView('tracking')} className={`flex flex-col items-center gap-1 ${view === 'tracking' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Truck size={24} strokeWidth={view === 'tracking' ? 2.5 : 2} /></button>
