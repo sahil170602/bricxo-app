@@ -25,7 +25,6 @@ android {
         }
     }
 
-    // 👇 THIS IS THE FIX FOR THE BUILD ERROR
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -35,6 +34,16 @@ android {
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+// 👇 THIS BLOCK FIXES THE "DUPLICATE CLASS" ERROR
+// It forces all dependencies to use the same Kotlin version (1.8.22)
+configurations.all {
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name.contains('kotlin-stdlib')) {
+            details.useVersion '1.8.22'
+        }
     }
 }
 
