@@ -18,16 +18,17 @@ const OWNER_PHONE_NUMBER = "917972506748";
 // --- Components ---
 
 const Navbar = ({ darkMode, toggleTheme, onOpenCalc }) => (
+  // FIXED: Always bg-slate-900 (Dark Header) regardless of theme
   <div className="absolute top-0 left-0 right-0 flex justify-between items-center px-6 py-4 pt-3 bg-slate-900 z-50 border-b border-slate-800 shadow-lg h-[72px]">
     <div>
       <h1 className="text-xl font-black tracking-tighter text-orange-500">BRICXO</h1>
       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Construction Supply</p>
     </div>
     <div className="flex gap-2">
-      <button onClick={onOpenCalc} className="p-2 rounded-xl bg-slate-800 text-blue-400 hover:bg-slate-700 transition-colors">
+      <button onClick={onOpenCalc} className="p-2 rounded-xl bg-slate-800 text-blue-400 hover:bg-slate-700 transition-colors border border-slate-700">
         <CalculatorIcon size={18} />
       </button>
-      <button onClick={toggleTheme} className="p-2 rounded-xl bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors">
+      <button onClick={toggleTheme} className="p-2 rounded-xl bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors border border-slate-700">
         {darkMode ? <Sun size={18} /> : <Moon size={18} />}
       </button>
     </div>
@@ -37,10 +38,11 @@ const Navbar = ({ darkMode, toggleTheme, onOpenCalc }) => (
 const ProductCard = ({ product, qty, onUpdateQty }) => {
   const [imgError, setImgError] = useState(false);
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-gray-900 p-3 rounded-[24px] shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden group flex flex-col justify-between">
+    // FIXED: Card has border to stand out against white background
+    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-gray-900 p-3 rounded-[24px] shadow-sm border border-gray-200 dark:border-gray-800 relative overflow-hidden group flex flex-col justify-between transition-colors duration-300">
       
       {/* IMAGE SECTION */}
-      <div className="h-32 flex items-center justify-center mb-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+      <div className="h-32 flex items-center justify-center mb-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl transition-colors duration-300">
         {!imgError && product.image ? (
           <img 
             src={product.image} 
@@ -109,6 +111,7 @@ const LoginScreen = ({ onLogin }) => {
   };
 
   return (
+    // FIXED: Login screen stays dark premium style
     <div className="fixed inset-0 w-full h-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center z-[60]">
       <div className="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl border border-slate-700 shadow-orange-500/10">
         <Construction size={48} className="text-orange-500" />
@@ -171,7 +174,8 @@ const HomePage = ({ products, qtyHelper, updateQty }) => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search featured items..." 
-            className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-orange-500/20 shadow-sm transition-all" 
+            // FIXED: Search bar has border in light mode
+            className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 outline-none focus:ring-2 focus:ring-orange-500/20 shadow-sm transition-all text-gray-900 dark:text-white" 
           />
         </div>
       </div>
@@ -201,7 +205,8 @@ const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
 
   return (
     <div className="h-full w-full relative">
-      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-4 shadow-lg h-[110px]">
+      {/* FIXED HEADER: Always Dark Slate 900 */}
+      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-4 shadow-lg h-[110px] transition-colors duration-300">
         <div className="flex justify-between items-center mb-3">
            <h2 className="text-lg font-black px-2 text-white">All Products</h2>
            <div className="relative w-48">
@@ -211,7 +216,7 @@ const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..." 
-                className="w-full pl-9 pr-4 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 outline-none text-xs focus:border-orange-500" 
+                className="w-full pl-9 pr-4 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder-slate-500 outline-none text-xs focus:border-orange-500 transition-colors" 
               />
            </div>
         </div>
@@ -260,12 +265,13 @@ const AccountPage = ({ user, onLogout }) => {
 
   return (
     <div className="h-full relative w-full">
-      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center">
+      {/* FIXED HEADER: Always Dark Slate 900 */}
+      <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center transition-colors duration-300">
         <h2 className="text-lg font-black text-white">My Account</h2>
       </div>
 
       <div className="h-full overflow-y-auto pt-[70px] pb-32 px-6 no-scrollbar">
-        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl mb-6 text-center border border-gray-100 dark:border-gray-800 shadow-sm mt-2">
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl mb-6 text-center border border-gray-100 dark:border-gray-800 shadow-sm mt-2 transition-colors duration-300">
           <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600 text-3xl font-bold shadow-inner">{user.name ? user.name[0] : <UserCircle size={40} />}</div>
           <h3 className="font-bold text-lg text-slate-800 dark:text-white">{user.name}</h3>
           <p className="text-xs text-gray-500">{user.phone}</p>
@@ -275,7 +281,7 @@ const AccountPage = ({ user, onLogout }) => {
         <h4 className="text-xs font-bold uppercase text-gray-400 mb-4 ml-1">Order History</h4>
         <div className="space-y-3">
           {orders.length === 0 ? <p className="text-sm text-gray-400 italic text-center py-4">No past orders.</p> : orders.map(order => (
-            <div key={order.id} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl shadow-sm">
+            <div key={order.id} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-2xl shadow-sm transition-colors duration-300">
               <div className="flex justify-between mb-2">
                 <span className="font-bold text-sm text-orange-600">Order #{order.id.split('-')[1]}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-blue-600'}`}>{order.status}</span>
@@ -303,8 +309,9 @@ const TrackingPage = ({ user }) => {
   }, [user]);
 
   return (
-    <div className="h-full relative bg-gray-50 dark:bg-gray-900 w-full overflow-hidden">
-      <div className="absolute top-0 z-30 w-full bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center">
+    <div className="h-full relative bg-gray-50 dark:bg-gray-900 w-full overflow-hidden transition-colors duration-300">
+      {/* FIXED HEADER: Always Dark Slate 900 */}
+      <div className="absolute top-0 z-30 w-full bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center transition-colors duration-300">
         <h2 className="text-lg font-black text-white">Track Order</h2>
       </div>
 
@@ -330,10 +337,10 @@ const TrackingPage = ({ user }) => {
       </div>
 
       {activeOrder && (
-        <div className="absolute bottom-24 left-4 right-4 bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 z-10">
+        <div className="absolute bottom-24 left-4 right-4 bg-white dark:bg-gray-800 p-5 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 z-10 transition-colors duration-300">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-black text-lg flex items-center gap-2">{activeOrder.status === 'Out for Delivery' ? "Arriving Soon" : "Order Placed"}</h3>
+              <h3 className="font-black text-lg flex items-center gap-2 text-gray-900 dark:text-white">{activeOrder.status === 'Out for Delivery' ? "Arriving Soon" : "Order Placed"}</h3>
               <p className="text-xs text-gray-500">{activeOrder.items.length} Items • Order #{activeOrder.id.split('-')[1]}</p>
             </div>
             <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center text-orange-600">{activeOrder.status === 'Out for Delivery' ? <Truck size={20} /> : <Package size={20} />}</div>
@@ -362,17 +369,17 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
   };
   return (
     <motion.div initial={{ opacity: 0, x: "100%" }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: "100%" }} className="fixed inset-0 z-50 bg-white dark:bg-gray-950 flex flex-col h-full">
-      <div className="p-6 pt-3 flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 bg-slate-900 text-white"><button onClick={onClose} className="p-2 bg-slate-800 rounded-full"><ArrowLeft size={20} /></button><h2 className="text-xl font-black">Checkout</h2></div>
+      {/* FIXED HEADER: Always Dark */}
+      <div className="p-6 pt-3 flex items-center gap-4 border-b border-slate-800 bg-slate-900 text-white transition-colors duration-300"><button onClick={onClose} className="p-2 bg-slate-800 rounded-full hover:bg-slate-700 border border-slate-700"><ArrowLeft size={20} /></button><h2 className="text-xl font-black">Checkout</h2></div>
       <div className="p-6 space-y-4 overflow-y-auto h-full pb-24">
         
-        {/* FIXED: Added dark mode classes so text is visible */}
-        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <p className="font-bold text-gray-800 dark:text-gray-100">Deliver to:</p>
           <p className="text-gray-700 dark:text-gray-300">{user.name}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{user.address}</p>
         </div>
         
-        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 transition-colors duration-300">
           <p className="font-bold mb-2 text-gray-800 dark:text-gray-100">Items:</p>
           {cart.map(i => (
             <div key={i.id} className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
@@ -390,8 +397,6 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
 
 const UserApp = () => {
   const [user, setUser] = useState(null);
-  
-  // 🔄 AUTO DETECT THEME ON LOAD
   const [darkMode, setDarkMode] = useState(() => {
     if (localStorage.getItem('theme')) {
       return localStorage.getItem('theme') === 'dark';
@@ -421,7 +426,6 @@ const UserApp = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // 🔄 Handle Theme Changes
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -453,14 +457,13 @@ const UserApp = () => {
   if (!user) return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden flex flex-col">
+    // FIXED: Body is White (Light) or Slate-950 (Dark).
+    <div className="fixed inset-0 w-full h-full bg-white dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden flex flex-col transition-colors duration-300">
       
-      {/* Header */}
       {view !== 'tracking' && view !== 'catalog' && view !== 'account' && (
         <Navbar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} onOpenCalc={() => setIsCalcOpen(true)} />
       )}
 
-      {/* Content Area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar w-full h-full relative" style={{ WebkitOverflowScrolling: 'touch' }}>
         <AnimatePresence mode="wait">
            {view === 'home' && <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-full"><HomePage products={products} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
@@ -470,15 +473,14 @@ const UserApp = () => {
         </AnimatePresence>
       </div>
 
-      {/* Floating Checkout Button */}
       <AnimatePresence>{totalItems > 0 && view !== 'checkout' && <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setView('checkout')} className="fixed bottom-24 right-6 bg-green-600 text-white p-4 rounded-full shadow-2xl z-40 flex items-center justify-center hover:scale-105 transition-transform"><Send size={24} /><span className="absolute -top-1 -right-1 bg-white text-green-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-green-600">{totalItems}</span></motion.button>}</AnimatePresence>
       
       <AnimatePresence>{view === 'checkout' && <CheckoutFlow cart={cart} user={user} onClose={() => setView('home')} onComplete={() => { setCart([]); setView('tracking'); }} />}</AnimatePresence>
       
       <Calculator isOpen={isCalcOpen} onClose={() => setIsCalcOpen(false)} />
 
-      {/* Bottom Nav */}
-      <div className="bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-safe-bottom z-50 shadow-2xl h-[80px] shrink-0">
+      {/* FIXED BOTTOM NAV: Always Dark Slate 900 */}
+      <div className="bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-safe-bottom z-50 shadow-2xl h-[80px] shrink-0 transition-colors duration-300">
         <button onClick={() => setView('home')} className={`flex flex-col items-center gap-1 ${view === 'home' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Home size={24} strokeWidth={view === 'home' ? 2.5 : 2} /></button>
         <button onClick={() => setView('catalog')} className={`flex flex-col items-center gap-1 ${view === 'catalog' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Package size={24} strokeWidth={view === 'catalog' ? 2.5 : 2} /></button>
         <button onClick={() => setView('tracking')} className={`flex flex-col items-center gap-1 ${view === 'tracking' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Truck size={24} strokeWidth={view === 'tracking' ? 2.5 : 2} /></button>
