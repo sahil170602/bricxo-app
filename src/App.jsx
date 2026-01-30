@@ -39,7 +39,7 @@ const ProductCard = ({ product, qty, onUpdateQty }) => {
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="bg-white dark:bg-gray-900 p-3 rounded-[24px] shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden group flex flex-col justify-between">
       
-      {/* IMAGE SECTION - With Error Handling */}
+      {/* IMAGE SECTION */}
       <div className="h-32 flex items-center justify-center mb-2 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
         {!imgError && product.image ? (
           <img 
@@ -94,7 +94,7 @@ const LoginScreen = ({ onLogin }) => {
     if(data) {
       onLogin(data);
     } else {
-      setStep(2); // No user found, go to registration
+      setStep(2); 
     }
     setLoading(false);
   };
@@ -109,10 +109,7 @@ const LoginScreen = ({ onLogin }) => {
   };
 
   return (
-    // FIXED: Added w-screen h-screen and fixed background
     <div className="fixed inset-0 w-full h-full bg-slate-900 flex flex-col items-center justify-center p-6 text-center z-[60]">
-      
-      {/* FIXED LOGO: Uses Icon instead of Image File */}
       <div className="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 shadow-2xl border border-slate-700 shadow-orange-500/10">
         <Construction size={48} className="text-orange-500" />
       </div>
@@ -165,7 +162,6 @@ const HomePage = ({ products, qtyHelper, updateQty }) => {
   );
 
   return (
-    // FIXED: Added h-full overflow-y-auto and Padding Top/Bottom for fixed header/nav
     <div className="h-full overflow-y-auto pt-[80px] pb-32 no-scrollbar">
       <div className="px-6 mt-2 mb-4">
         <div className="relative">
@@ -204,9 +200,7 @@ const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
   });
 
   return (
-    // FIXED: Main container takes full height
     <div className="h-full w-full relative">
-      {/* FIXED HEADER for Catalog */}
       <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-4 shadow-lg h-[110px]">
         <div className="flex justify-between items-center mb-3">
            <h2 className="text-lg font-black px-2 text-white">All Products</h2>
@@ -241,7 +235,6 @@ const CatalogPage = ({ products, categories, qtyHelper, updateQty }) => {
         </div>
       </div>
 
-      {/* SCROLLABLE BODY */}
       <div className="h-full overflow-y-auto pt-[120px] pb-32 px-6 no-scrollbar">
         <div className="grid grid-cols-2 gap-4">
           {filteredProducts.length > 0 ? filteredProducts.map(p => (
@@ -267,12 +260,10 @@ const AccountPage = ({ user, onLogout }) => {
 
   return (
     <div className="h-full relative w-full">
-      {/* FIXED HEADER */}
       <div className="absolute top-0 left-0 right-0 z-40 bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center">
         <h2 className="text-lg font-black text-white">My Account</h2>
       </div>
 
-      {/* SCROLLABLE BODY */}
       <div className="h-full overflow-y-auto pt-[70px] pb-32 px-6 no-scrollbar">
         <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl mb-6 text-center border border-gray-100 dark:border-gray-800 shadow-sm mt-2">
           <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-3 text-orange-600 text-3xl font-bold shadow-inner">{user.name ? user.name[0] : <UserCircle size={40} />}</div>
@@ -313,12 +304,10 @@ const TrackingPage = ({ user }) => {
 
   return (
     <div className="h-full relative bg-gray-50 dark:bg-gray-900 w-full overflow-hidden">
-      {/* FIXED HEADER */}
       <div className="absolute top-0 z-30 w-full bg-slate-900 border-b border-slate-800 pt-3 pb-3 px-6 shadow-lg h-[60px] flex items-center">
         <h2 className="text-lg font-black text-white">Track Order</h2>
       </div>
 
-      {/* MAP BACKGROUND (Non-scrolling usually, but handled by absolute inset) */}
       <div className="absolute inset-0 bg-[#e5e7eb] dark:bg-[#1f2937] overflow-hidden pt-[60px] pb-[80px]">
         {activeOrder ? (
           <>
@@ -375,8 +364,24 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
     <motion.div initial={{ opacity: 0, x: "100%" }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: "100%" }} className="fixed inset-0 z-50 bg-white dark:bg-gray-950 flex flex-col h-full">
       <div className="p-6 pt-3 flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 bg-slate-900 text-white"><button onClick={onClose} className="p-2 bg-slate-800 rounded-full"><ArrowLeft size={20} /></button><h2 className="text-xl font-black">Checkout</h2></div>
       <div className="p-6 space-y-4 overflow-y-auto h-full pb-24">
-        <div className="bg-gray-50 p-4 rounded-xl"><p className="font-bold">Deliver to:</p><p>{user.name}</p><p className="text-sm text-gray-500">{user.address}</p></div>
-        <div className="bg-gray-50 p-4 rounded-xl"><p className="font-bold mb-2">Items:</p>{cart.map(i => <div key={i.id} className="flex justify-between text-sm"><span>{i.name}</span><span>x{i.qty}</span></div>)}</div>
+        
+        {/* FIXED: Added dark mode classes so text is visible */}
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+          <p className="font-bold text-gray-800 dark:text-gray-100">Deliver to:</p>
+          <p className="text-gray-700 dark:text-gray-300">{user.name}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{user.address}</p>
+        </div>
+        
+        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700">
+          <p className="font-bold mb-2 text-gray-800 dark:text-gray-100">Items:</p>
+          {cart.map(i => (
+            <div key={i.id} className="flex justify-between text-sm text-gray-700 dark:text-gray-300">
+              <span>{i.name}</span>
+              <span>x{i.qty}</span>
+            </div>
+          ))}
+        </div>
+        
         <button onClick={handleWhatsAppOrder} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">Confirm Order <Send size={20} /></button>
       </div>
     </motion.div>
@@ -385,7 +390,15 @@ const CheckoutFlow = ({ cart, user, onClose, onComplete }) => {
 
 const UserApp = () => {
   const [user, setUser] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
+  
+  // 🔄 AUTO DETECT THEME ON LOAD
+  const [darkMode, setDarkMode] = useState(() => {
+    if (localStorage.getItem('theme')) {
+      return localStorage.getItem('theme') === 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
+
   const [isCalcOpen, setIsCalcOpen] = useState(false);
   const [cart, setCart] = useState([]);
   const [view, setView] = useState('home');
@@ -408,7 +421,16 @@ const UserApp = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => { if (darkMode) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); }, [darkMode]);
+  // 🔄 Handle Theme Changes
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
 
   const handleLogin = (userData) => { setUser(userData); localStorage.setItem('bricxo_session_phone', userData.phone); };
   const handleLogout = () => { setUser(null); localStorage.removeItem('bricxo_session_phone'); setCart([]); setView('home'); };
@@ -431,18 +453,14 @@ const UserApp = () => {
   if (!user) return <LoginScreen onLogin={handleLogin} />;
 
   return (
-    // 🔒 FIX: Use 'fixed inset-0' to lock the app to the viewport exactly.
     <div className="fixed inset-0 w-full h-full bg-gray-50/50 dark:bg-gray-950 text-gray-900 dark:text-white font-sans overflow-hidden flex flex-col">
       
-      {/* Header - Remains Absolute/Fixed at top */}
+      {/* Header */}
       {view !== 'tracking' && view !== 'catalog' && view !== 'account' && (
         <Navbar darkMode={darkMode} toggleTheme={() => setDarkMode(!darkMode)} onOpenCalc={() => setIsCalcOpen(true)} />
       )}
 
-      {/* SCROLLABLE CONTENT AREA 
-         - flex-1: Takes up all remaining space between header and footer
-         - overflow-y-auto: Allows ONLY this part to scroll
-      */}
+      {/* Content Area */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar w-full h-full relative" style={{ WebkitOverflowScrolling: 'touch' }}>
         <AnimatePresence mode="wait">
            {view === 'home' && <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-full"><HomePage products={products} qtyHelper={getItemQty} updateQty={handleUpdateQty} /></motion.div>}
@@ -455,13 +473,11 @@ const UserApp = () => {
       {/* Floating Checkout Button */}
       <AnimatePresence>{totalItems > 0 && view !== 'checkout' && <motion.button initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} onClick={() => setView('checkout')} className="fixed bottom-24 right-6 bg-green-600 text-white p-4 rounded-full shadow-2xl z-40 flex items-center justify-center hover:scale-105 transition-transform"><Send size={24} /><span className="absolute -top-1 -right-1 bg-white text-green-600 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-green-600">{totalItems}</span></motion.button>}</AnimatePresence>
       
-      {/* Checkout Overlay */}
       <AnimatePresence>{view === 'checkout' && <CheckoutFlow cart={cart} user={user} onClose={() => setView('home')} onComplete={() => { setCart([]); setView('tracking'); }} />}</AnimatePresence>
       
-      {/* Calculator Overlay */}
       <Calculator isOpen={isCalcOpen} onClose={() => setIsCalcOpen(false)} />
 
-      {/* Bottom Nav - Fixed at bottom of the Flex container */}
+      {/* Bottom Nav */}
       <div className="bg-slate-900 border-t border-slate-800 flex justify-around py-4 pb-safe-bottom z-50 shadow-2xl h-[80px] shrink-0">
         <button onClick={() => setView('home')} className={`flex flex-col items-center gap-1 ${view === 'home' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Home size={24} strokeWidth={view === 'home' ? 2.5 : 2} /></button>
         <button onClick={() => setView('catalog')} className={`flex flex-col items-center gap-1 ${view === 'catalog' ? 'text-orange-500' : 'text-slate-400 hover:text-slate-200'}`}><Package size={24} strokeWidth={view === 'catalog' ? 2.5 : 2} /></button>
