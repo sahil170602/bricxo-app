@@ -12,8 +12,8 @@ html, body {
   user-select: none;
   background-color: #0f172a;
 
-  /* 👇 THIS IS THE FIX: Pushes app down below the notch/status bar */
-  padding-top: env(safe-area-inset-top); 
+  /* 👇 FORCED FIX: Ensures at least 40px padding on top, or more if the device needs it */
+  padding-top: max(40px, env(safe-area-inset-top)); 
   padding-bottom: env(safe-area-inset-bottom);
 }
 
