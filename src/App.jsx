@@ -12,7 +12,7 @@ import { supabase } from './supabaseClient';
 import Calculator from './Calculator';
 import AdminDashboard from './AdminDashboard';
 
-// --- ASSET IMPORTS ---
+// --- ASSET IMPORTS (Make sure these files exist in src/assets/) ---
 import sandImg from './assets/sand.png'; 
 import bricksImg from './assets/bricks.png';
 import aggregatesImg from './assets/aggregates.png';
