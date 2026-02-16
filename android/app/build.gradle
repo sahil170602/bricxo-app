@@ -3,7 +3,6 @@ apply plugin: 'com.android.application'
 android {
     namespace = "com.bricxo.supply"
     compileSdk = rootProject.ext.compileSdkVersion
-
     defaultConfig {
         applicationId "com.bricxo.supply"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -11,41 +10,23 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        
-        // 👇 ADD THIS LINE HERE
-        setProperty("archivesBaseName", "Bricxo")
-
         aaptOptions {
-             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
 }
 
 repositories {
     flatDir{
         dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
-    }
-}
-
-// 👇 THIS BLOCK FIXES THE "DUPLICATE CLASS" ERROR
-// It forces all dependencies to use the same Kotlin version (1.8.22)
-configurations.all {
-    resolutionStrategy.eachDependency { details ->
-        if (details.requested.group == 'org.jetbrains.kotlin' && details.requested.name.contains('kotlin-stdlib')) {
-            details.useVersion '1.8.22'
-        }
     }
 }
 
